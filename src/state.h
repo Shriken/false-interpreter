@@ -8,10 +8,9 @@
 
 class State {
 	StackMember *topOfStack;
-	int stackDepth;
 public:
-	State() : topOfStack(NULL), stackDepth(0) {}
+	State() : topOfStack(NULL) {}
 
 	StackMember *getTopOfStack() { return this->topOfStack; }
-	bool parse(char *commands);
+	bool eval(char *commands);
 };

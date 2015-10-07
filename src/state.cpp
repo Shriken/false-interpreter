@@ -1,6 +1,6 @@
 #include "state.h"
 
-bool parse(char *cmds) {
+bool State::eval(char *cmds) {
 	assert(cmds != NULL);
 
 	// while the command is not null
