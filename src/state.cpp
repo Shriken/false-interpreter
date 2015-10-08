@@ -29,12 +29,45 @@ bool State::evalChar(const char c) {
 		StackMember *top;
 		StackMember *second;
 		switch (c) {
+			case '+':
+				top = pop();
+				second = pop();
+				assert(top->type == INTEGER && second->type == INTEGER);
+
+				push(top->data.integer + second->data.integer);
+
+				delete top;
+				delete second;
+				break;
+
 			case '*':
 				top = pop();
 				second = pop();
 				assert(top->type == INTEGER && second->type == INTEGER);
 
 				push(top->data.integer * second->data.integer);
+
+				delete top;
+				delete second;
+				break;
+
+			case '/':
+				top = pop();
+				second = pop();
+				assert(top->type == INTEGER && second->type == INTEGER);
+
+				push(top->data.integer / second->data.integer);
+
+				delete top;
+				delete second;
+				break;
+
+			case '-':
+				top = pop();
+				second = pop();
+				assert(top->type == INTEGER && second->type == INTEGER);
+
+				push(top->data.integer - second->data.integer);
 
 				delete top;
 				delete second;
