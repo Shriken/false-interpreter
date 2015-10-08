@@ -3,6 +3,7 @@
 enum StackMemberType {
 	INTEGER,
 	LAMBDA,
+	VARIABLE,
 	STRING
 };
 

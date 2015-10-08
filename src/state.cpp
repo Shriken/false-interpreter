@@ -60,7 +60,6 @@ bool State::evalChar(const char c) {
 			case '~':
 			case '.':
 			case ',':
-			case '$':
 				top = pop();
 				assert(top != NULL);
 				assert(top->type == INTEGER);
@@ -73,10 +72,23 @@ bool State::evalChar(const char c) {
 					printf("%i", top->data.integer);
 				else if (c == ',')
 					printf("%c", top->data.integer);
-				else if (c == '$') {
-					push(top->data.integer);
-					push(top->data.integer);
-				}
+				break;
+
+			case '$':
+				top = pop();
+				assert(top != NULL);
+				push(top->data.integer);
+				push(top->data.integer);
+				break;
+
+			case '\\':
+				top = pop();
+				second = pop();
+				assert(top != NULL && second != NULL);
+				push(top);
+				push(second);
+				top = NULL;
+				second = NULL;
 				break;
 
 			case '\'':
