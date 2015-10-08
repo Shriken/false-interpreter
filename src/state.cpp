@@ -50,11 +50,11 @@ bool State::evalChar(const char c) {
 				if (c == '+')
 					push(top->data.integer + second->data.integer);
 				else if (c == '-')
-					push(top->data.integer - second->data.integer);
+					push(second->data.integer - top->data.integer);
 				else if (c == '*')
 					push(top->data.integer * second->data.integer);
 				else if (c == '/')
-					push(top->data.integer / second->data.integer);
+					push(second->data.integer / top->data.integer);
 				else if (c == '&')
 					push(top->data.integer & second->data.integer);
 				else if (c == '|')
@@ -114,6 +114,10 @@ bool State::evalChar(const char c) {
 				}
 				push(new StackMember(*second));
 				second = NULL;
+				break;
+
+			case '^':
+				push(getc(stdin));
 				break;
 
 			case '<':
