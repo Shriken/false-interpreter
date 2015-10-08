@@ -15,6 +15,12 @@ bool State::evalChar(const char c) {
 	if (evalState == CHAR_CODE) {
 		push(new StackMember(c));
 		evalState = STANDARD;
+	} else if (evalState == IN_STRING) {
+		if (c == '"') {
+			evalState = STANDARD;
+		} else {
+			printf("%c", c);
+		}
 	} else if ('0' <= c && c <= '9') {
 		if (evalState != IN_NUMBER) {
 			evalState = IN_NUMBER;
@@ -75,10 +81,16 @@ bool State::evalChar(const char c) {
 				break;
 
 			case '$':
+			case '%':
 				top = pop();
 				assert(top != NULL);
-				push(top->data.integer);
-				push(top->data.integer);
+
+				if (c == '$') {
+					push(top->data.integer);
+					push(top->data.integer);
+				} else if (c== '%') {
+					break; // drop
+				}
 				break;
 
 			case '\\':
@@ -91,9 +103,32 @@ bool State::evalChar(const char c) {
 				second = NULL;
 				break;
 
+			case '`':
+				// pick nth
+				top = pop();
+				second = topOfStack;
+				assert(second != NULL);
+				while (top->data.integer-- > 0) {
+					second = second->next;
+					assert(second != NULL);
+				}
+				push(new StackMember(*second));
+				second = NULL;
+				break;
+
+			case '<':
+				// flush buffered IO
+				// TODO
+				break;
+
 			case '\'':
 				// char literal
 				evalState = CHAR_CODE;
+				break;
+
+			case '"':
+				// string print
+				evalState = IN_STRING;
 				break;
 
 			case ' ':
