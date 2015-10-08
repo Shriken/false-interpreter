@@ -15,4 +15,10 @@ union StackMemberContents {
 struct StackMember {
 	StackMemberType type;
 	StackMemberContents data;
+	StackMember *next;
+
+	StackMember(int i) {
+		type = INTEGER;
+		data.integer = i;
+	}
 };

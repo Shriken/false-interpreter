@@ -1,6 +1,6 @@
 CXX = g++
 
-CXXFLAGS  = -Wall -Werror -g
+CXXFLAGS  = -Wall -Werror -g -Wno-c++11-extensions
 LDFLAGS   = -lm -lGLEW `pkg-config --libs opencv`
 
 PLATFORM_FLAGS =

@@ -1,6 +1,7 @@
 #include "main.h"
 
 int main(int argc, char **argv) {
-	printf("%p\n", state.getTopOfStack());
+	state.eval("5 4*.");
+	printf("\n");
 	return EXIT_SUCCESS;
 }
