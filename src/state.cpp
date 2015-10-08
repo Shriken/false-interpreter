@@ -29,6 +29,7 @@ bool State::evalChar(const char c) {
 		StackMember *top = NULL;
 		StackMember *second = NULL;
 		switch (c) {
+			// binary commands
 			case '+':
 			case '-':
 			case '*':
@@ -37,6 +38,7 @@ bool State::evalChar(const char c) {
 			case '|':
 				top = pop();
 				second = pop();
+				assert(top != NULL && second != NULL);
 				assert(top->type == INTEGER && second->type == INTEGER);
 
 				if (c == '+')
@@ -51,6 +53,19 @@ bool State::evalChar(const char c) {
 					push(top->data.integer & second->data.integer);
 				else if (c == '|')
 					push(top->data.integer | second->data.integer);
+				break;
+
+			// unary commands
+			case '_':
+			case '~':
+				top = pop();
+				assert(top != NULL);
+				assert(top->type == INTEGER);
+
+				if (c == '_')
+					push(-top->data.integer);
+				else if (c == '~')
+					push(~top->data.integer);
 				break;
 
 			case '.':
