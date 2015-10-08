@@ -42,6 +42,8 @@ bool State::evalChar(const char c) {
 			case '/':
 			case '&':
 			case '|':
+			case '>':
+			case '=':
 				top = pop();
 				second = pop();
 				assert(top != NULL && second != NULL);
@@ -59,6 +61,11 @@ bool State::evalChar(const char c) {
 					push(top->data.integer & second->data.integer);
 				else if (c == '|')
 					push(top->data.integer | second->data.integer);
+				else if (c == '>') {
+					push(-(second->data.integer > top->data.integer));
+				} else if (c == '=') {
+					push(-(second->data.integer == top->data.integer));
+				}
 				break;
 
 			// unary commands
