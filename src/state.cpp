@@ -116,6 +116,16 @@ bool State::evalChar(const char c) {
 				second = NULL;
 				break;
 
+			case '@':
+				// rot
+				top = pop();
+				second = topOfStack->next;
+				top->next = second->next;
+				second->next = top;
+				second = NULL;
+				top = NULL;
+				break;
+
 			case '^':
 				push(getc(stdin));
 				break;
