@@ -1,7 +1,7 @@
 #include "main.h"
 
 int main(int argc, char **argv) {
-	state.eval("4 3~*.");
+	state.eval("'c$.,");
 	printf("\n");
 	return EXIT_SUCCESS;
 }
