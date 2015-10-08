@@ -26,58 +26,37 @@ bool State::evalChar(const char c) {
 		if (evalState == IN_NUMBER) push(intValue);
 		evalState = STANDARD;
 
-		StackMember *top;
-		StackMember *second;
+		StackMember *top = NULL;
+		StackMember *second = NULL;
 		switch (c) {
 			case '+':
-				top = pop();
-				second = pop();
-				assert(top->type == INTEGER && second->type == INTEGER);
-
-				push(top->data.integer + second->data.integer);
-
-				delete top;
-				delete second;
-				break;
-
-			case '*':
-				top = pop();
-				second = pop();
-				assert(top->type == INTEGER && second->type == INTEGER);
-
-				push(top->data.integer * second->data.integer);
-
-				delete top;
-				delete second;
-				break;
-
-			case '/':
-				top = pop();
-				second = pop();
-				assert(top->type == INTEGER && second->type == INTEGER);
-
-				push(top->data.integer / second->data.integer);
-
-				delete top;
-				delete second;
-				break;
-
 			case '-':
+			case '*':
+			case '/':
+			case '&':
+			case '|':
 				top = pop();
 				second = pop();
 				assert(top->type == INTEGER && second->type == INTEGER);
 
-				push(top->data.integer - second->data.integer);
-
-				delete top;
-				delete second;
+				if (c == '+')
+					push(top->data.integer + second->data.integer);
+				else if (c == '-')
+					push(top->data.integer - second->data.integer);
+				else if (c == '*')
+					push(top->data.integer * second->data.integer);
+				else if (c == '/')
+					push(top->data.integer / second->data.integer);
+				else if (c == '&')
+					push(top->data.integer & second->data.integer);
+				else if (c == '|')
+					push(top->data.integer | second->data.integer);
 				break;
 
 			case '.':
 				top = pop();
 				assert(top->type == INTEGER);
 				printf("%i", top->data.integer);
-				delete top;
 				break;
 
 			case ' ':
@@ -87,6 +66,9 @@ bool State::evalChar(const char c) {
 				error("command %c not recognized\n", c);
 				return false;
 		}
+
+		if (top != NULL) delete top;
+		if (second != NULL) delete second;
 	}
 
 	return true;
