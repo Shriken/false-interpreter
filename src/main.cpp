@@ -1,6 +1,18 @@
 #include "main.h"
 
 int main(int argc, char **argv) {
-	state.eval("1 2 3@1-=\\>.'\n,");
+	bool quitting = false;
+
+	printf("\n> ");
+	while (!quitting) {
+		char c = getc(stdin);
+		if (c == EOF) {
+			printf("\n");
+			break;
+		}
+		if (c == '\n') printf("\n> ");
+		state.evalChar(c);
+	}
+
 	return EXIT_SUCCESS;
 }

@@ -153,6 +153,7 @@ bool State::evalChar(const char c) {
 				break;
 
 			case ' ':
+			case '\n':
 				break;
 
 			default:
@@ -178,4 +179,27 @@ StackMember *State::pop() {
 	StackMember *popped = topOfStack;
 	topOfStack = popped->next;
 	return popped;
+}
+
+void State::printEvalState() {
+	switch (evalState) {
+		case CHAR_CODE:
+			printf("CHAR_CODE\n");
+			break;
+		case IN_STRING:
+			printf("IN_STRING\n");
+			break;
+		case IN_COMMENT:
+			printf("IN_COMMENT\n");
+			break;
+		case IN_NUMBER:
+			printf("IN_NUMBER\n");
+			break;
+		case STANDARD:
+			printf("STANDARD\n");
+			break;
+		default:
+			error("bad eval state\n");
+			break;
+	}
 }

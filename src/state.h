@@ -27,4 +27,6 @@ public:
 	void push(int val) { push(new StackMember(val)); }
 	void push(StackMember *stackMember);
 	StackMember *pop();
+
+	void printEvalState();
 };
