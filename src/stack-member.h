@@ -18,6 +18,7 @@ struct StackMember {
 	StackMemberContents data;
 	StackMember *next;
 
+	StackMember() {}
 	StackMember(int i) {
 		type = INTEGER;
 		data.integer = i;

@@ -10,6 +10,7 @@ int main(int argc, char **argv) {
 			printf("\n");
 			break;
 		}
+
 		if (c == '\n') printf("\n> ");
 		state.evalChar(c);
 	}

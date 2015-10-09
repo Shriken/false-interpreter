@@ -1,5 +1,19 @@
 #include "state.h"
 
+State::~State() {
+	while (currentPage != NULL) {
+		ProgramPage *page = currentPage;
+		currentPage = currentPage->prev;
+		delete page;
+	}
+
+	while (topOfStack != NULL) {
+		StackMember *member = topOfStack;
+		topOfStack = topOfStack->next;
+		delete member;
+	}
+}
+
 bool State::eval(const char *program) {
 	assert(program != NULL);
 
@@ -12,6 +26,8 @@ bool State::eval(const char *program) {
 }
 
 bool State::evalChar(const char c) {
+	addCommand(c);
+
 	if (evalState == CHAR_CODE) {
 		push(new StackMember(c));
 		evalState = STANDARD;
@@ -20,6 +36,12 @@ bool State::evalChar(const char c) {
 			evalState = STANDARD;
 		} else {
 			printf("%c", c);
+		}
+	} else if (evalState == IN_LAMBDA) {
+		if (c == '[') {
+			lambdaDepth++;
+		} else if (c == ']' && --lambdaDepth == 0) {
+			evalState = STANDARD;
 		}
 	} else if ('0' <= c && c <= '9') {
 		if (evalState != IN_NUMBER) {
@@ -152,6 +174,12 @@ bool State::evalChar(const char c) {
 				evalState = IN_STRING;
 				break;
 
+			case '[':
+				evalState = IN_LAMBDA;
+				push(refTo(currentPage));
+				lambdaDepth++;
+				break;
+
 			case ' ':
 			case '\n':
 				break;
@@ -179,6 +207,26 @@ StackMember *State::pop() {
 	StackMember *popped = topOfStack;
 	topOfStack = popped->next;
 	return popped;
+}
+
+void State::push(ProgramLocation programPos) {
+	StackMember *member = new StackMember();
+	member->type = LAMBDA;
+	member->data.lambda = programPos.page->data + programPos.offset;
+	push(member);
+}
+
+void State::addCommand(const char c) {
+	if (currentPage->curPos == PAGE_SIZE) {
+		currentPage->next = new ProgramPage();
+		currentPage = currentPage->next;
+	}
+
+	currentPage->data[currentPage->curPos++] = c;
+}
+
+ProgramLocation State::refTo(ProgramPage *programPos) {
+	return ProgramLocation(programPos, programPos->curPos);
 }
 
 void State::printEvalState() {
