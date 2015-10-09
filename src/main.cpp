@@ -3,7 +3,7 @@
 int main(int argc, char **argv) {
 	bool quitting = false;
 
-	printf("\n> ");
+	printf("> ");
 	while (!quitting) {
 		char c = getc(stdin);
 		if (c == EOF) {
