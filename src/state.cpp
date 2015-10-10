@@ -19,6 +19,7 @@ bool State::eval(const char *program) {
 
 	// while the command is not null
 	for (char c = *(program++); c != 0; c = *(program++)) {
+		addCommand(c);
 		if (!evalChar(c)) return false;
 	}
 
@@ -26,24 +27,26 @@ bool State::eval(const char *program) {
 }
 
 bool State::evalChar(const char c) {
-	addCommand(c);
-
 	if (evalState == CHAR_CODE) {
+		// push this char to the stack
 		push(new StackMember(c));
 		evalState = STANDARD;
 	} else if (evalState == IN_STRING) {
+		// keep printing until we hit a close quote
 		if (c == '"') {
 			evalState = STANDARD;
 		} else {
 			printf("%c", c);
 		}
 	} else if (evalState == IN_LAMBDA) {
+		// TODO
 		if (c == '[') {
 			lambdaDepth++;
 		} else if (c == ']' && --lambdaDepth == 0) {
 			evalState = STANDARD;
 		}
 	} else if ('0' <= c && c <= '9') {
+		// parse number until we hit the end
 		if (evalState != IN_NUMBER) {
 			evalState = IN_NUMBER;
 			intValue = 0;
@@ -51,9 +54,11 @@ bool State::evalChar(const char c) {
 
 		intValue = intValue * 10 + c - '0';
 	} else {
+		// if we were parsing an int before, push it
 		if (evalState == IN_NUMBER) push(intValue);
 		evalState = STANDARD;
 
+		// run command normally
 		StackMember *top = NULL;
 		StackMember *second = NULL;
 		switch (c) {
