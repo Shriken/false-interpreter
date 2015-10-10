@@ -39,6 +39,10 @@ bool State::evalChar(const char c) {
 		} else {
 			printf("%c", c);
 		}
+	} else if (evalState == IN_COMMENT) {
+		if (c == '}') {
+			evalState = STANDARD;
+		}
 	} else if (evalState == IN_LAMBDA) {
 		// TODO
 		if (c == '[') {
