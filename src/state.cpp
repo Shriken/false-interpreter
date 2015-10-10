@@ -18,7 +18,8 @@ bool State::eval(const char *program) {
 	assert(program != NULL);
 
 	// while the command is not null
-	for (char c = *(program++); c != 0; c = *(program++)) {
+	char c;
+	while ((c = *(program++))) {
 		addCommand(c);
 		if (!evalChar(c)) return false;
 	}
