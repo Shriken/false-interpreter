@@ -15,4 +15,13 @@ struct ProgramLocation {
 
 	ProgramLocation(ProgramPage *page, int offset)
 		: page(page), offset(offset) {}
+
+	void nextCommand() {
+		++offset;
+		while (offset >= PAGE_SIZE) {
+			assert(page->next != NULL);
+			page = page->next;
+			offset -= PAGE_SIZE;
+		}
+	}
 };

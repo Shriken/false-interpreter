@@ -17,10 +17,12 @@ enum EvalState {
 };
 
 class State {
+	int lambdaDepth = 0;
+	EvalState evalState = STANDARD;
 	StackMember *topOfStack = NULL;
 	ProgramPage *currentPage = new ProgramPage();
-	EvalState evalState = STANDARD;
-	int lambdaDepth = 0;
+	ProgramLocation programLocation = ProgramLocation(currentPage, 0);
+
 	int intValue;
 public:
 	State() {}

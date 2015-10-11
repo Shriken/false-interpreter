@@ -28,6 +28,8 @@ bool State::eval(const char *program) {
 }
 
 bool State::evalChar(const char c) {
+	int jumped = 0;
+
 	if (evalState == CHAR_CODE) {
 		// push this char to the stack
 		push(new StackMember(c));
@@ -199,6 +201,10 @@ bool State::evalChar(const char c) {
 		if (second != NULL) delete second;
 	}
 
+	// if we haven't just jumped, step program location forward
+	if (!jumped) {
+		programLocation.nextCommand();
+	}
 	return true;
 }
 
