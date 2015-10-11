@@ -23,6 +23,8 @@ class State {
 	ProgramPage *currentPage = new ProgramPage();
 	ProgramLocation programLocation = ProgramLocation(currentPage, 0);
 
+	ProgramLocation *callStack = NULL;
+
 	int intValue;
 public:
 	State() {}

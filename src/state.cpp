@@ -28,7 +28,7 @@ bool State::eval(const char *program) {
 }
 
 bool State::evalChar(const char c) {
-	int jumped = 0;
+	bool jumped = false;
 
 	if (evalState == CHAR_CODE) {
 		// push this char to the stack
@@ -185,6 +185,13 @@ bool State::evalChar(const char c) {
 				evalState = IN_LAMBDA;
 				push(refTo(currentPage));
 				lambdaDepth++;
+				break;
+
+			case ']': // jump back
+				assert(callStack != NULL);
+				programLocation = *callStack;
+				callStack = callStack->next;
+				jumped = true;
 				break;
 
 			// whitespace
