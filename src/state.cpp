@@ -58,7 +58,7 @@ bool State::evalChar(const char c) {
 		}
 
 		intValue = intValue * 10 + c - '0';
-	} else {
+	} else { // STANDARD mode
 		// if we were parsing an int before, push it
 		if (evalState == IN_NUMBER) push(intValue);
 		evalState = STANDARD;
@@ -68,14 +68,14 @@ bool State::evalChar(const char c) {
 		StackMember *second = NULL;
 		switch (c) {
 			// binary commands
-			case '+':
-			case '-':
-			case '*':
-			case '/':
-			case '&':
-			case '|':
-			case '>':
-			case '=':
+			case '+': // add
+			case '-': // subtract
+			case '*': // multiply
+			case '/': // divide
+			case '&': // AND
+			case '|': // OR
+			case '>': // greater than
+			case '=': // equal
 				top = pop();
 				second = pop();
 				assert(top != NULL && second != NULL);
@@ -101,10 +101,10 @@ bool State::evalChar(const char c) {
 				break;
 
 			// unary commands
-			case '_':
-			case '~':
-			case '.':
-			case ',':
+			case '_': // negate
+			case '~': // NOT
+			case '.': // print int
+			case ',': // print char
 				top = pop();
 				assert(top != NULL);
 				assert(top->type == INTEGER);
@@ -119,8 +119,8 @@ bool State::evalChar(const char c) {
 					printf("%c", top->data.integer);
 				break;
 
-			case '$':
-			case '%':
+			case '$': // dup
+			case '%': // drop
 				top = pop();
 				assert(top != NULL);
 
@@ -132,7 +132,7 @@ bool State::evalChar(const char c) {
 				}
 				break;
 
-			case '\\':
+			case '\\': // swap
 				top = pop();
 				second = pop();
 				assert(top != NULL && second != NULL);
@@ -142,8 +142,7 @@ bool State::evalChar(const char c) {
 				second = NULL;
 				break;
 
-			case '`':
-				// pick nth
+			case '`': // pick nth
 				top = pop();
 				second = topOfStack;
 				assert(second != NULL);
@@ -155,8 +154,7 @@ bool State::evalChar(const char c) {
 				second = NULL;
 				break;
 
-			case '@':
-				// rot
+			case '@': // rot
 				top = pop();
 				second = topOfStack->next;
 				top->next = second->next;
@@ -165,31 +163,29 @@ bool State::evalChar(const char c) {
 				top = NULL;
 				break;
 
-			case '^':
+			case '^': // getchar
 				push(getc(stdin));
 				break;
 
-			case '<':
-				// flush buffered IO
+			case '<': // flush buffered IO
 				// TODO
 				break;
 
-			case '\'':
-				// char literal
+			case '\'': // push char literal
 				evalState = CHAR_CODE;
 				break;
 
-			case '"':
-				// string print
+			case '"': // print string
 				evalState = IN_STRING;
 				break;
 
-			case '[':
+			case '[': // push lambda
 				evalState = IN_LAMBDA;
 				push(refTo(currentPage));
 				lambdaDepth++;
 				break;
 
+			// whitespace
 			case ' ':
 			case '\n':
 				break;

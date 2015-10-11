@@ -9,7 +9,7 @@ enum StackMemberType {
 
 union StackMemberContents {
 	int integer;
-	char *lambda;
+	char *lambda; // TODO fix lambdas
 	char *string;
 };
 
