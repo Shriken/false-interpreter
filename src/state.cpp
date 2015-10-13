@@ -22,12 +22,21 @@ bool State::eval(const char *program) {
 	while ((c = *(program++))) {
 		addCommand(c);
 		if (!evalChar(c)) return false;
+
+		printf("%p\n", callStack);
+		while (callStack != NULL) {
+			// we're in a lambda, run it before continuing
+			evalChar(
+				*(programLocation.page->data + programLocation.offset)
+			);
+		}
 	}
 
 	return true;
 }
 
 bool State::evalChar(const char c) {
+	ProgramLocation *pl = NULL;
 	bool jumped = false;
 
 	if (evalState == CHAR_CODE) {
@@ -51,7 +60,6 @@ bool State::evalChar(const char c) {
 			lambdaDepth++;
 		} else if (c == ']' && --lambdaDepth == 0) {
 			evalState = STANDARD;
-			printStack();
 		}
 	} else if ('0' <= c && c <= '9') {
 		// parse number until we hit the end
@@ -128,8 +136,8 @@ bool State::evalChar(const char c) {
 				assert(top != NULL);
 
 				if (c == '$') {
-					push(top->data.integer);
-					push(top->data.integer);
+					push(top);
+					push(new StackMember(*top));
 				} else if (c== '%') {
 					break; // drop
 				}
@@ -192,15 +200,28 @@ bool State::evalChar(const char c) {
 			case '!': // exec lambda
 				top = pop();
 				assert(top->type == LAMBDA);
-				lambdaDepth++;
+
+				// push current location to callstack
+				pl = new ProgramLocation(programLocation);
+				pl->next = callStack;
+				callStack = pl;
+				// jump to start of lambda internals
+				programLocation = *(top->data.lambda);
+				jumped = true;
 				break;
 
 			// note: only called here if we're execing a lambda
 			case ']': // jump back
 				assert(callStack != NULL);
-				programLocation = *callStack;
+				pl = callStack;
+				programLocation = *pl;
 				callStack = callStack->next;
+				delete pl;
 				jumped = true;
+				break;
+
+			case '(':
+				printStack();
 				break;
 
 			// whitespace
@@ -209,7 +230,7 @@ bool State::evalChar(const char c) {
 				break;
 
 			default:
-				error("command %c not recognized\n", c);
+				error("command %c (%i) not recognized\n", c, c);
 				return false;
 		}
 
@@ -221,6 +242,11 @@ bool State::evalChar(const char c) {
 	if (!jumped) {
 		programLocation.nextCommand();
 	}
+
+	if (callStack != NULL) {
+		evalChar(*(programLocation.page->data + programLocation.offset));
+	}
+
 	return true;
 }
 

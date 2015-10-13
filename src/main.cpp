@@ -11,8 +11,9 @@ int main(int argc, char **argv) {
 			break;
 		}
 
-		if (c == '\n') printf("> ");
+		state.addCommand(c);
 		state.evalChar(c);
+		if (c == '\n') printf("> ");
 	}
 
 	return EXIT_SUCCESS;
