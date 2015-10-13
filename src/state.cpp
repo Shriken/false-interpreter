@@ -51,6 +51,7 @@ bool State::evalChar(const char c) {
 			lambdaDepth++;
 		} else if (c == ']' && --lambdaDepth == 0) {
 			evalState = STANDARD;
+			printStack();
 		}
 	} else if ('0' <= c && c <= '9') {
 		// parse number until we hit the end
@@ -116,9 +117,9 @@ bool State::evalChar(const char c) {
 				else if (c == '~')
 					push(~top->data.integer);
 				else if (c == '.')
-					printf("%i", top->data.integer);
+					printf("%i\n", top->data.integer);
 				else if (c == ',')
-					printf("%c", top->data.integer);
+					printf("%c\n", top->data.integer);
 				break;
 
 			case '$': // dup
@@ -184,6 +185,7 @@ bool State::evalChar(const char c) {
 			case '[': // push lambda
 				evalState = IN_LAMBDA;
 				push(programLocation);
+				topOfStack->data.lambda->offset++;
 				lambdaDepth++;
 				break;
 
@@ -268,5 +270,33 @@ void State::printEvalState() {
 		default:
 			error("bad eval state\n");
 			break;
+	}
+}
+
+void State::printStack() {
+	StackMember *member = topOfStack;
+	while (member != NULL) {
+		ProgramLocation *lambda;
+		switch (member->type) {
+			case INTEGER:
+				printf("INTEGER: %d\n", member->data.integer);
+				break;
+			case LAMBDA:
+				lambda = member->data.lambda;
+				printf(
+					"LAMBDA: page %p, offset %d\n",
+					lambda->page,
+					lambda->offset
+				);
+				break;
+			case VARIABLE:
+				printf("VARIABLE: %c\n", member->data.variable);
+				break;
+			case STRING:
+				printf("STRING %s\n", member->data.string);
+				break;
+		}
+
+		member = member->next;
 	}
 }

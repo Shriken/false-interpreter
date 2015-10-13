@@ -41,4 +41,5 @@ public:
 	void addCommand(const char c);
 
 	void printEvalState();
+	void printStack();
 };

@@ -11,7 +11,7 @@ int main(int argc, char **argv) {
 			break;
 		}
 
-		if (c == '\n') printf("\n> ");
+		if (c == '\n') printf("> ");
 		state.evalChar(c);
 	}
 
