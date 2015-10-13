@@ -9,7 +9,8 @@ enum StackMemberType {
 
 union StackMemberContents {
 	int integer;
-	char *lambda; // TODO fix lambdas
+	ProgramLocation *lambda;
+	char variable;
 	char *string;
 };
 
@@ -22,5 +23,12 @@ struct StackMember {
 	StackMember(int i) {
 		type = INTEGER;
 		data.integer = i;
+	}
+	StackMember(ProgramLocation pos) {
+		type = LAMBDA;
+		data.lambda = new ProgramLocation(pos);
+	}
+	~StackMember() {
+		if (type == LAMBDA) delete data.lambda;
 	}
 };

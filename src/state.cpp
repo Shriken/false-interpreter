@@ -183,10 +183,17 @@ bool State::evalChar(const char c) {
 
 			case '[': // push lambda
 				evalState = IN_LAMBDA;
-				push(refTo(currentPage));
+				push(programLocation);
 				lambdaDepth++;
 				break;
 
+			case '!': // exec lambda
+				top = pop();
+				assert(top->type == LAMBDA);
+				lambdaDepth++;
+				break;
+
+			// note: only called here if we're execing a lambda
 			case ']': // jump back
 				assert(callStack != NULL);
 				programLocation = *callStack;
@@ -229,10 +236,7 @@ StackMember *State::pop() {
 }
 
 void State::push(ProgramLocation programPos) {
-	StackMember *member = new StackMember();
-	member->type = LAMBDA;
-	member->data.lambda = programPos.page->data + programPos.offset;
-	push(member);
+	push(new StackMember(programPos));
 }
 
 void State::addCommand(const char c) {
@@ -242,10 +246,6 @@ void State::addCommand(const char c) {
 	}
 
 	currentPage->data[currentPage->curPos++] = c;
-}
-
-ProgramLocation State::refTo(ProgramPage *programPos) {
-	return ProgramLocation(programPos, programPos->curPos);
 }
 
 void State::printEvalState() {

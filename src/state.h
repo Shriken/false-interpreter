@@ -39,7 +39,6 @@ public:
 	StackMember *pop();
 
 	void addCommand(const char c);
-	ProgramLocation refTo(ProgramPage *programPos);
 
 	void printEvalState();
 };
