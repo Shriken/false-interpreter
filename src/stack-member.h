@@ -4,14 +4,12 @@ enum StackMemberType {
 	INTEGER,
 	LAMBDA,
 	VARIABLE,
-	STRING
 };
 
 union StackMemberContents {
 	int integer;
 	ProgramLocation *lambda;
 	char variable;
-	char *string;
 };
 
 struct StackMember {
@@ -24,10 +22,21 @@ struct StackMember {
 		type = INTEGER;
 		data.integer = i;
 	}
+
 	StackMember(ProgramLocation pos) {
 		type = LAMBDA;
 		data.lambda = new ProgramLocation(pos);
 	}
+
+	StackMember(StackMember *member) {
+		this->type = member->type;
+		if (type == LAMBDA) {
+			this->data.lambda = new ProgramLocation(*member->data.lambda);
+		} else {
+			this->data = member->data;
+		}
+	}
+
 	~StackMember() {
 		if (type == LAMBDA) delete data.lambda;
 	}
