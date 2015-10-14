@@ -136,8 +136,8 @@ bool State::evalChar(const char c) {
 				assert(top != NULL);
 
 				if (c == '$') {
-					push(top);
-					push(new StackMember(*top));
+					push(new StackMember(top));
+					push(new StackMember(top));
 				} else if (c== '%') {
 					break; // drop
 				}
@@ -317,9 +317,6 @@ void State::printStack() {
 				break;
 			case VARIABLE:
 				printf("VARIABLE: %c\n", member->data.variable);
-				break;
-			case STRING:
-				printf("STRING %s\n", member->data.string);
 				break;
 		}
 
