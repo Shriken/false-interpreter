@@ -31,8 +31,9 @@ public:
 	~State();
 
 	StackMember *getTopOfStack() { return this->topOfStack; }
-	bool eval(const char *commands);
 	bool evalChar(const char c);
+	bool execLambda(StackMember *lambda);
+
 	void push(int val) { push(new StackMember(val)); }
 	void push(StackMember *stackMember);
 	void push(ProgramLocation programPos);

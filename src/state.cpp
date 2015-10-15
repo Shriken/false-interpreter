@@ -14,27 +14,6 @@ State::~State() {
 	}
 }
 
-bool State::eval(const char *program) {
-	assert(program != NULL);
-
-	// while the command is not null
-	char c;
-	while ((c = *(program++))) {
-		addCommand(c);
-		if (!evalChar(c)) return false;
-
-		printf("%p\n", callStack);
-		while (callStack != NULL) {
-			// we're in a lambda, run it before continuing
-			evalChar(
-				*(programLocation.page->data + programLocation.offset)
-			);
-		}
-	}
-
-	return true;
-}
-
 bool State::evalChar(const char c) {
 	ProgramLocation *pl = NULL;
 	bool jumped = false;
