@@ -198,16 +198,21 @@ bool State::evalChar(const char c) {
 				break;
 
 			case '!': // exec lambda
+			case '?':
 				top = pop();
+				if (c == '?') second = pop();
 				assert(top->type == LAMBDA);
 
-				// push current location to callstack
-				pl = new ProgramLocation(programLocation);
-				pl->next = callStack;
-				callStack = pl;
-				// jump to start of lambda internals
-				programLocation = *(top->data.lambda);
-				jumped = true;
+				// if ! or condition is true, exec lambda
+				if (c == '!' || second->data.integer == -1) {
+					// push current location to callstack
+					pl = new ProgramLocation(programLocation);
+					pl->next = callStack;
+					callStack = pl;
+					// jump to start of lambda internals
+					programLocation = *(top->data.lambda);
+					jumped = true;
+				}
 				break;
 
 			// note: only called here if we're execing a lambda
