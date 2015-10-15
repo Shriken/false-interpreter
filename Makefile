@@ -1,7 +1,7 @@
 CXX = g++
 
 CXXFLAGS  = -Wall -Werror -g -Wno-c++11-extensions
-LDFLAGS   = -lm -lGLEW `pkg-config --libs opencv`
+LDFLAGS   =
 
 PLATFORM_FLAGS =
 
@@ -15,11 +15,9 @@ OBJ = $(patsubst $(SRCDIR)/%.cpp,$(OBJDIR)/%.o,$(SRC))
 ifeq ($(shell uname -s), Darwin)
 	CXX = clang++
 	PLATFORM_FLAGS = -mmacosx-version-min=10.7 -D__MAC__
-	LDFLAGS += -framework GLUT -framework OpenGL
 endif
 
 CXXFLAGS += $(PLATFORM_FLAGS)
-CXXFLAGS += `pkg-config --cflags opencv`
 
 all: $(BIN)
 
