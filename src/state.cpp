@@ -52,7 +52,7 @@ bool State::evalChar(const char c) {
 		evalState = STANDARD;
 
 		// run command normally
-		StackMember *top = NULL;
+		StackMember *first = NULL;
 		StackMember *second = NULL;
 		switch (c) {
 			// binary commands
@@ -64,27 +64,27 @@ bool State::evalChar(const char c) {
 			case '|': // OR
 			case '>': // greater than
 			case '=': // equal
-				top = pop();
+				first = pop();
 				second = pop();
-				assert(top != NULL && second != NULL);
-				assert(top->type == INTEGER && second->type == INTEGER);
+				assert(first != NULL && second != NULL);
+				assert(first->type == INTEGER && second->type == INTEGER);
 
 				if (c == '+')
-					push(top->data.integer + second->data.integer);
+					push(first->data.integer + second->data.integer);
 				else if (c == '-')
-					push(second->data.integer - top->data.integer);
+					push(second->data.integer - first->data.integer);
 				else if (c == '*')
-					push(top->data.integer * second->data.integer);
+					push(first->data.integer * second->data.integer);
 				else if (c == '/')
-					push(second->data.integer / top->data.integer);
+					push(second->data.integer / first->data.integer);
 				else if (c == '&')
-					push(top->data.integer & second->data.integer);
+					push(first->data.integer & second->data.integer);
 				else if (c == '|')
-					push(top->data.integer | second->data.integer);
+					push(first->data.integer | second->data.integer);
 				else if (c == '>') {
-					push(-(second->data.integer > top->data.integer));
+					push(-(second->data.integer > first->data.integer));
 				} else if (c == '=') {
-					push(-(second->data.integer == top->data.integer));
+					push(-(second->data.integer == first->data.integer));
 				}
 				break;
 
@@ -93,48 +93,48 @@ bool State::evalChar(const char c) {
 			case '~': // NOT
 			case '.': // print int
 			case ',': // print char
-				top = pop();
-				assert(top != NULL);
-				assert(top->type == INTEGER);
+				first = pop();
+				assert(first != NULL);
+				assert(first->type == INTEGER);
 
 				if (c == '_')
-					push(-top->data.integer);
+					push(-first->data.integer);
 				else if (c == '~')
-					push(~top->data.integer);
+					push(~first->data.integer);
 				else if (c == '.')
-					printf("%i\n", top->data.integer);
+					printf("%i\n", first->data.integer);
 				else if (c == ',')
-					printf("%c\n", top->data.integer);
+					printf("%c\n", first->data.integer);
 				break;
 
 			case '$': // dup
 			case '%': // drop
-				top = pop();
-				assert(top != NULL);
+				first = pop();
+				assert(first != NULL);
 
 				if (c == '$') {
-					push(new StackMember(top));
-					push(new StackMember(top));
+					push(new StackMember(first));
+					push(new StackMember(first));
 				} else if (c== '%') {
 					break; // drop
 				}
 				break;
 
 			case '\\': // swap
-				top = pop();
+				first = pop();
 				second = pop();
-				assert(top != NULL && second != NULL);
-				push(top);
+				assert(first != NULL && second != NULL);
+				push(first);
 				push(second);
-				top = NULL;
+				first = NULL;
 				second = NULL;
 				break;
 
 			case '`': // pick nth
-				top = pop();
+				first = pop();
 				second = topOfStack;
 				assert(second != NULL);
-				while (top->data.integer-- > 0) {
+				while (first->data.integer-- > 0) {
 					second = second->next;
 					assert(second != NULL);
 				}
@@ -143,12 +143,12 @@ bool State::evalChar(const char c) {
 				break;
 
 			case '@': // rot
-				top = pop();
+				first = pop();
 				second = topOfStack->next;
-				top->next = second->next;
-				second->next = top;
+				first->next = second->next;
+				second->next = first;
 				second = NULL;
-				top = NULL;
+				first = NULL;
 				break;
 
 			case '^': // getchar
@@ -175,19 +175,19 @@ bool State::evalChar(const char c) {
 				break;
 
 			case '!': // exec lambda
-				top = pop();
-				assert(top->type == LAMBDA);
-				execLambda(top);
+				first = pop();
+				assert(first->type == LAMBDA);
+				execLambda(first);
 				break;
 
 			case '?':
-				top = pop();
+				first = pop();
 				second = pop();
-				assert(top->type == LAMBDA);
+				assert(first->type == LAMBDA);
 				assert(second->type == INTEGER);
 
 				// if condition is true, exec lambda
-				if (second->data.integer == -1) execLambda(top);
+				if (second->data.integer == -1) execLambda(first);
 				break;
 
 			case ']':
@@ -209,7 +209,7 @@ bool State::evalChar(const char c) {
 				return false;
 		}
 
-		if (top != NULL) delete top;
+		if (first != NULL) delete first;
 		if (second != NULL) delete second;
 	}
 
