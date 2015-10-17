@@ -177,19 +177,21 @@ bool State::evalChar(const char c) {
 				break;
 
 			case '!': // exec lambda
+				top = pop();
+				assert(top->type == LAMBDA);
+				execLambda(top);
+				jumped = true;
+				break;
+
 			case '?':
 				top = pop();
-				if (c == '?') second = pop();
+				second = pop();
 				assert(top->type == LAMBDA);
+				assert(second->type == INTEGER);
 
-				// if ! or condition is true, exec lambda
-				if (c == '!' || second->data.integer == -1) {
-					// push current location to callstack
-					pl = new ProgramLocation(programLocation);
-					pl->next = callStack;
-					callStack = pl;
-					// jump to start of lambda internals
-					programLocation = *(top->data.lambda);
+				// if condition is true, exec lambda
+				if (second->data.integer == -1) {
+					execLambda(top);
 					jumped = true;
 				}
 				break;
@@ -231,6 +233,18 @@ bool State::evalChar(const char c) {
 		evalChar(*(programLocation.page->data + programLocation.offset));
 	}
 
+	return true;
+}
+
+bool State::execLambda(StackMember *lambda) {
+	assert(lambda->type == LAMBDA);
+
+	// push current location to the callstack
+	auto curLocation = new ProgramLocation(programLocation);
+	curLocation->next = callStack;
+	callStack = curLocation;
+
+	programLocation = *lambda->data.lambda;
 	return true;
 }
 
