@@ -15,9 +15,6 @@ State::~State() {
 }
 
 bool State::evalChar(const char c) {
-	ProgramLocation *pl = NULL;
-	bool jumped = false;
-
 	if (evalState == CHAR_CODE) {
 		// push this char to the stack
 		push(new StackMember(c));
@@ -180,7 +177,6 @@ bool State::evalChar(const char c) {
 				top = pop();
 				assert(top->type == LAMBDA);
 				execLambda(top);
-				jumped = true;
 				break;
 
 			case '?':
@@ -190,20 +186,12 @@ bool State::evalChar(const char c) {
 				assert(second->type == INTEGER);
 
 				// if condition is true, exec lambda
-				if (second->data.integer == -1) {
-					execLambda(top);
-					jumped = true;
-				}
+				if (second->data.integer == -1) execLambda(top);
 				break;
 
-			// note: only called here if we're execing a lambda
-			case ']': // jump back
-				assert(callStack != NULL);
-				pl = callStack;
-				programLocation = *pl;
-				callStack = callStack->next;
-				delete pl;
-				jumped = true;
+			case ']':
+				// we should only hit these in execLambda. parse error!
+				error("] hit where not expected\n");
 				break;
 
 			case '(':
@@ -224,14 +212,8 @@ bool State::evalChar(const char c) {
 		if (second != NULL) delete second;
 	}
 
-	// if we haven't just jumped, step program location forward
-	if (!jumped) {
-		programLocation.nextCommand();
-	}
-
-	if (callStack != NULL) {
-		evalChar(*(programLocation.page->data + programLocation.offset));
-	}
+	// step program forward
+	programLocation.nextCommand();
 
 	return true;
 }
@@ -245,6 +227,18 @@ bool State::execLambda(StackMember *lambda) {
 	callStack = curLocation;
 
 	programLocation = *lambda->data.lambda;
+	char c;
+	while (
+		lambdaDepth > 0 ||
+		(c = programLocation.page->data[programLocation.offset]) != ']'
+	) {
+		evalChar(c);
+	}
+
+	// pop from callstack
+	programLocation = *callStack;
+	callStack = callStack->next;
+
 	return true;
 }
 
