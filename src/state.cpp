@@ -54,6 +54,7 @@ bool State::evalChar(const char c) {
 		// run command normally
 		StackMember *first = NULL;
 		StackMember *second = NULL;
+		StackMember *third = NULL;
 		switch (c) {
 			// binary commands
 			case '+': // add
@@ -188,6 +189,27 @@ bool State::evalChar(const char c) {
 
 				// if condition is true, exec lambda
 				if (second->data.integer == -1) execLambda(first);
+				break;
+
+			case '#':
+				first = pop();
+				assert(first->type == LAMBDA);
+				second = pop();
+				assert(second->type == LAMBDA);
+
+				// test the condition
+				execLambda(second);
+				third = pop();
+				assert(third->type == INTEGER);
+				while (third->data.integer == -1) {
+					execLambda(first);
+
+					// test the condition
+					execLambda(second);
+					delete third;
+					third = pop();
+					assert(third->type == INTEGER);
+				}
 				break;
 
 			case ']':
