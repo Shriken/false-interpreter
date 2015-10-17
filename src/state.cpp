@@ -23,6 +23,7 @@ bool State::evalChar(const char c) {
 		// keep printing until we hit a close quote
 		if (c == '"') {
 			evalState = STANDARD;
+			printf("\n");
 		} else {
 			printf("%c", c);
 		}
@@ -169,7 +170,7 @@ bool State::evalChar(const char c) {
 			case '[': // push lambda
 				evalState = IN_LAMBDA;
 				push(programLocation);
-				topOfStack->data.lambda->offset++;
+				topOfStack->data.lambda->nextCommand();
 				lambdaDepth++;
 				break;
 
@@ -229,8 +230,8 @@ bool State::execLambda(StackMember *lambda) {
 	programLocation = *lambda->data.lambda;
 	char c;
 	while (
-		lambdaDepth > 0 ||
-		(c = programLocation.page->data[programLocation.offset]) != ']'
+		(c = programLocation.page->data[programLocation.offset]) != ']' ||
+		lambdaDepth > 0
 	) {
 		evalChar(c);
 	}
