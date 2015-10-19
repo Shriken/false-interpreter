@@ -9,7 +9,7 @@ enum StackMemberType {
 union StackMemberContents {
 	int integer;
 	ProgramLocation *lambda;
-	char variable;
+	int variable;
 };
 
 struct StackMember {

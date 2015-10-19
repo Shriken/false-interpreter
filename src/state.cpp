@@ -46,6 +46,14 @@ bool State::evalChar(const char c) {
 		}
 
 		intValue = intValue * 10 + c - '0';
+	} else if ('a' <= c && c <= 'z') {
+		// if we were parsing an int before, push it
+		if (evalState == IN_NUMBER) push(intValue);
+		evalState = STANDARD;
+
+		auto var = new StackMember(c - 'a');
+		var->type = VARIABLE;
+		push(var);
 	} else { // STANDARD mode
 		// if we were parsing an int before, push it
 		if (evalState == IN_NUMBER) push(intValue);
@@ -214,7 +222,22 @@ bool State::evalChar(const char c) {
 
 			case ']':
 				// we should only hit these in execLambda. parse error!
-				error("] hit where not expected\n");
+				error("unmatched end-of-lambda (])\n");
+				break;
+
+			case ':':
+				// store into variable
+				first = pop();
+				second = pop();
+				assert(first->type == VARIABLE);
+				variables[first->data.variable] = *second;
+				break;
+
+			case ';':
+				// fetch from variable
+				first = pop();
+				assert(first->type == VARIABLE);
+				push(variables[first->data.variable]);
 				break;
 
 			case '(':
@@ -270,16 +293,21 @@ void State::push(StackMember *stackMember) {
 	topOfStack = stackMember;
 }
 
+void State::push(StackMember member) {
+	auto newMember = new StackMember(member);
+	push(newMember);
+}
+
+void State::push(ProgramLocation programPos) {
+	push(new StackMember(programPos));
+}
+
 StackMember *State::pop() {
 	assert(topOfStack != NULL);
 
 	StackMember *popped = topOfStack;
 	topOfStack = popped->next;
 	return popped;
-}
-
-void State::push(ProgramLocation programPos) {
-	push(new StackMember(programPos));
 }
 
 void State::addCommand(const char c) {
@@ -331,7 +359,7 @@ void State::printStack() {
 				);
 				break;
 			case VARIABLE:
-				printf("VARIABLE: %c\n", member->data.variable);
+				printf("VARIABLE: %c\n", member->data.variable + 'a');
 				break;
 		}
 

@@ -24,6 +24,7 @@ class State {
 	ProgramLocation programLocation = ProgramLocation(currentPage, 0);
 
 	ProgramLocation *callStack = NULL;
+	StackMember variables[26];
 
 	int intValue;
 public:
@@ -36,6 +37,7 @@ public:
 
 	void push(int val) { push(new StackMember(val)); }
 	void push(StackMember *stackMember);
+	void push(StackMember stackMember);
 	void push(ProgramLocation programPos);
 	StackMember *pop();
 
