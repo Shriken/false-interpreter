@@ -1,7 +1,8 @@
 #pragma once
 
-#include <stdlib.h>
 #include <assert.h>
+#include <stdlib.h>
+#include <string.h>
 
 #include "error.h"
 #include "program-record.h"
@@ -28,7 +29,9 @@ class State {
 
 	int intValue;
 public:
-	State() {}
+	State() {
+		memset(variables, 0, sizeof(StackMember) * 26);
+	}
 	~State();
 
 	StackMember *getTopOfStack() { return this->topOfStack; }
@@ -37,7 +40,6 @@ public:
 
 	void push(int val) { push(new StackMember(val)); }
 	void push(StackMember *stackMember);
-	void push(StackMember stackMember);
 	void push(ProgramLocation programPos);
 	StackMember *pop();
 

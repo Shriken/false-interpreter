@@ -230,14 +230,25 @@ bool State::evalChar(const char c) {
 				first = pop();
 				second = pop();
 				assert(first->type == VARIABLE);
+
+				third = variables + first->data.variable;
+				if (third->next != NULL && third->type == LAMBDA) {
+					delete third->data.lambda;
+				}
 				variables[first->data.variable] = *second;
+				third->next = ((StackMember *)NULL) + 1;
+				if (second->type == LAMBDA) {
+					third->data.lambda =
+						new ProgramLocation(second->data.lambda);
+				}
+				third = NULL;
 				break;
 
 			case ';':
 				// fetch from variable
 				first = pop();
 				assert(first->type == VARIABLE);
-				push(variables[first->data.variable]);
+				push(new StackMember(variables + first->data.variable));
 				break;
 
 			case '(':
@@ -264,15 +275,16 @@ bool State::evalChar(const char c) {
 	return true;
 }
 
-bool State::execLambda(StackMember *lambda) {
-	assert(lambda->type == LAMBDA);
+bool State::execLambda(StackMember *member) {
+	assert(member->type == LAMBDA);
+	auto lambda = member->data.lambda;
 
 	// push current location to the callstack
 	auto curLocation = new ProgramLocation(programLocation);
 	curLocation->next = callStack;
 	callStack = curLocation;
 
-	programLocation = *lambda->data.lambda;
+	programLocation = *lambda;
 	char c;
 	while (
 		(c = programLocation.page->data[programLocation.offset]) != ']' ||
@@ -291,11 +303,6 @@ bool State::execLambda(StackMember *lambda) {
 void State::push(StackMember *stackMember) {
 	stackMember->next = topOfStack;
 	topOfStack = stackMember;
-}
-
-void State::push(StackMember member) {
-	auto newMember = new StackMember(member);
-	push(newMember);
 }
 
 void State::push(ProgramLocation programPos) {

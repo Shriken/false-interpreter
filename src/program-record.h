@@ -14,6 +14,8 @@ struct ProgramLocation {
 	int offset;
 	ProgramLocation *next;
 
+	ProgramLocation(ProgramLocation *location)
+		: page(location->page), offset(location->offset) {}
 	ProgramLocation(ProgramPage *page, int offset)
 		: page(page), offset(offset) {}
 

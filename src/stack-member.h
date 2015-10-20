@@ -31,7 +31,7 @@ struct StackMember {
 	StackMember(StackMember *member) {
 		this->type = member->type;
 		if (type == LAMBDA) {
-			this->data.lambda = new ProgramLocation(*member->data.lambda);
+			this->data.lambda = new ProgramLocation(member->data.lambda);
 		} else {
 			this->data = member->data;
 		}
